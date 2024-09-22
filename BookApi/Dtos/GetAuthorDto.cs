@@ -1,9 +1,9 @@
 ﻿namespace BookApi.Dtos
 {
-    public class AuthorGetDto
+    public class GetAuthorDto
     {
         public int AuthorId { get; set; }
         public string AuthorName { get; set; }
-        public byte[] AuthorPhoto { get; set; }
+        public string AuthorPhoto { get; set; }
     }
 }

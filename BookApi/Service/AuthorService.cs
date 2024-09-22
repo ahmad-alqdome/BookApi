@@ -13,29 +13,30 @@ namespace BookApi.Service
             _context = context;
         }
 
-        public async Task<IEnumerable<AuthorGetDto>> GetAllAuthorsAsync()
+        public async Task<IEnumerable<GetAuthorDto>> GetAllAuthorsAsync()
         {
-            var all= await _context.Authors
+            var allAuthors= await _context.Authors
                 .Select( data=>
-                new AuthorGetDto
-                 {
+                new GetAuthorDto
+                {
                  AuthorId=data.AuthorId,
                     AuthorName=data.AuthorName ,
-                    AuthorPhoto=data.AuthorPhoto 
+                    AuthorPhoto=Convert.ToBase64String(data.AuthorPhoto) 
                 }
                 
                 ).ToListAsync();
 
-
-
-            return all;
+            return allAuthors;
         }
 
-        public async Task<AuthorGetDto> GetAuthorAsync(int id)
+        public async Task<GetAuthorDto> GetAuthorAsync(int id)
         {
             var author = await _context.Authors
                 .Where(data=>data.AuthorId==id)
-                .Select(data =>new AuthorGetDto { AuthorId = data.AuthorId ,  AuthorName=data.AuthorName , AuthorPhoto = data.AuthorPhoto })
+                .Select(data =>new GetAuthorDto { 
+                 AuthorId = data.AuthorId 
+                ,AuthorName=data.AuthorName 
+                ,AuthorPhoto = Convert.ToBase64String(data.AuthorPhoto) })
                 .FirstOrDefaultAsync();
               
                

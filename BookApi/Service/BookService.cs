@@ -12,11 +12,11 @@ namespace BookApi.Service
             _context = context;
         }
 
-        public async Task<IEnumerable<BookDetailsDto>> GetAllBooksAsync()
+        public async Task<IEnumerable<GetBookDto>> GetAllBooksAsync()
         {
             var allBooks = await _context.Books
          .Include(b => b.Author)
-         .Select(b => new BookDetailsDto
+         .Select(b => new GetBookDto
          {
              BookId = b.BookId,
              Title = b.Title,
@@ -30,12 +30,12 @@ namespace BookApi.Service
 
         }
 
-        public async Task<BookDetailsDto> GetBooksAsync(int id)
+        public async Task<GetBookDto> GetBooksAsync(int id)
         {
             var book = await _context.Books
         .Include(b => b.Author)
         .Where(b => b.BookId == id) // Filter here for clarity
-        .Select(b => new BookDetailsDto
+        .Select(b => new GetBookDto
         {
             BookId = b.BookId,
             Title = b.Title,

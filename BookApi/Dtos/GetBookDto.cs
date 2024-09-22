@@ -1,6 +1,6 @@
 ﻿namespace BookApi.Dtos
 {
-    public class BookDetailsDto
+    public class GetBookDto
     {
 
         public int BookId { get; set; }

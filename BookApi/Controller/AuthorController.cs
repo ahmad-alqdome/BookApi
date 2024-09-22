@@ -35,30 +35,29 @@ namespace BookApi.Controller
 
 
         [HttpPost]
-        public async Task<IActionResult> AddAsync([FromForm] AuthorAddDto authorAddDto)
+        public async Task<IActionResult> AddAsync([FromForm] AddAuthorDto authorDto)
         {
 
-            if (authorAddDto.AuthorPhoto == null)
+            if (authorDto.AuthorPhoto == null)
             {
                 return BadRequest("The Photo is Null");
             }
-            if (!allowedExtenstions.Contains(Path.GetExtension(authorAddDto.AuthorPhoto.FileName).ToLower()))
+            if (!allowedExtenstions.Contains(Path.GetExtension(authorDto.AuthorPhoto.FileName).ToLower()))
             {
                 return BadRequest("The invalid file");
             }
 
-            if (_maxAllowedPosterSize < authorAddDto.AuthorPhoto.Length)
+            if (_maxAllowedPosterSize < authorDto.AuthorPhoto.Length)
             {
                 return BadRequest("The photo size is higher");
             }
 
             using var dataStream = new MemoryStream();
-            await authorAddDto.AuthorPhoto.CopyToAsync(dataStream);
+            await authorDto.AuthorPhoto.CopyToAsync(dataStream);
 
             var author = new Author()
             {
-                AuthorName = authorAddDto.AuthorName
-                ,
+                AuthorName = authorDto.AuthorName,
                 AuthorPhoto = dataStream.ToArray()
             };
 
@@ -68,7 +67,7 @@ namespace BookApi.Controller
             return Ok(author);
         }
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(int id, [FromForm] AuthorAddDto authorAddDto)
+        public async Task<IActionResult> Update(int id, [FromForm] AddAuthorDto authorDto)
         {
             var author = await _authorService.GetAuthorAsync(id);
 
@@ -79,42 +78,46 @@ namespace BookApi.Controller
 
                 return NotFound($"No author was found with ID {id}");
 
-
-
             // اذا تم تغيير الصورة سيدخل تحديث الصورة 
 
-            if (authorAddDto.AuthorPhoto != null)
+            if (authorDto.AuthorPhoto != null)
             {
-                if (!allowedExtenstions.Contains(Path.GetExtension(authorAddDto.AuthorPhoto.FileName).ToLower()))
+                if (!allowedExtenstions.Contains(Path.GetExtension(authorDto.AuthorPhoto.FileName).ToLower()))
                 {
                     return BadRequest("The invalid file");
                 }
 
-                if (_maxAllowedPosterSize < authorAddDto.AuthorPhoto.Length)
+                if (_maxAllowedPosterSize < authorDto.AuthorPhoto.Length)
                 {
                     return BadRequest("The photo size is higher");
                 }
                 using var dataStream = new MemoryStream();
-                await authorAddDto.AuthorPhoto.CopyToAsync(dataStream);
+                await authorDto.AuthorPhoto.CopyToAsync(dataStream);
                 newAuthor.AuthorPhoto = dataStream.ToArray();
 
             }
+            newAuthor.AuthorId = id;
+            newAuthor.AuthorName = authorDto.AuthorName;
 
-            newAuthor.AuthorName = authorAddDto.AuthorName;
-
-            _authorService.Update(author);
+            _authorService.Update(newAuthor);
 
 
-            return Ok(author);
+            return Ok(newAuthor);
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delet(int id)
         {
-            var author = await _authorService.GetAuthorAsync(id);
+            var authorDto = await _authorService.GetAuthorAsync(id);
 
-            _authorService.Delete(author);
-            return Ok(author);
+            var newAuthor = new Author()
+            {
+                AuthorId = authorDto.AuthorId,
+                AuthorName  = authorDto.AuthorName, 
+            };
+
+            _authorService.Delete(newAuthor);
+            return Ok(authorDto);
         }
 
 

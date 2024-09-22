@@ -34,7 +34,7 @@ namespace BookApi.Controller
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddBookAsync([FromForm] BookAuthorDto bookAuthorDto)
+        public async Task<IActionResult> AddBookAsync([FromForm] AddBookDto bookAuthorDto)
         {
 
             if (bookAuthorDto.BookPhoto == null)
@@ -69,7 +69,7 @@ namespace BookApi.Controller
 
       
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateBook(int id, [FromForm] BookAuthorDto bookAuthorDto)
+        public async Task<IActionResult> UpdateBook(int id, [FromForm] AddBookDto bookAuthorDto)
         {
             var existingBook = await _bookService.GetBooksAsync(id);
             var newBook=new Book();
@@ -100,6 +100,25 @@ namespace BookApi.Controller
              _bookService.UpdateBookAsync(newBook);
 
             return Ok(newBook);
+        }
+        [HttpDelete("{id}")]
+        public async Task<IActionResult>  Delete (int id)
+        {
+            var authorDto = await _bookService.GetBooksAsync(id);
+
+            var book = new Book()
+            {
+            BookId = id,
+            Title = authorDto.Title,
+            AuthorId = authorDto.AuthorId,
+
+
+            };
+
+            _bookService.DeleteBookAsync(book);
+            return Ok(authorDto);
+
+
         }
 
     }
